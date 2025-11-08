@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Query Parameter Pro</title>
+    <title>Query Parameter Ultimate</title>
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -19,288 +19,284 @@
             --shadow: 0 2px 10px rgba(0,0,0,0.1);
             --transition: all 0.4s ease;
         }
-
-        .theme-dark {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --container-bg: #2d2d2d;
-            --output-bg: #3a3a3a;
-            --output-border: #555;
-        }
-
-        .font-mono { --font-family: 'Courier New', monospace; }
-        .size-small { --font-size: 14px; --padding: 12px; }
-        .size-large { --font-size: 18px; --padding: 28px; }
-        .no-border { --border: none; }
-        .no-shadow { --shadow: none; }
-
-        /* Layouts */
-        .layout-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        .layout-card { max-width: 400px; margin: 40px auto; }
-        .layout-list { max-width: 800px; }
-
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .animate-fade { animation: fadeIn 0.6s ease-out; }
-        .animate-slide { animation: slideIn 0.6s ease-out; }
-
-        body {
-            font-family: var(--font-family);
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-size: var(--font-size);
-            transition: var(--transition);
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: var(--padding);
-            background: var(--container-bg);
-            border: var(--border);
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-        }
-        h1 {
-            color: var(--accent-color);
-            margin-top: 0;
-            font-size: 2em;
-        }
-        #output {
-            margin-top: 20px;
-            padding: 15px;
-            background: var(--output-bg);
-            border: 1px solid var(--output-border);
-            border-radius: 4px;
-            font-family: monospace;
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-        form {
-            margin-top: 20px;
-        }
-        input[type="text"] {
-            width: 68%;
-            padding: 8px;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: inherit;
-            font-size: 0.95em;
-        }
-        button {
-            padding: 8px 16px;
-            background: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: 0.2s;
-        }
-        button:hover { opacity: 0.9; }
-        .example { margin: 15px 0; font-size: 0.9em; color: #666; }
-        .example code { background: #eee; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
-        .debug-panel {
-            margin-top: 20px;
-            padding: 12px;
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.8em;
-            display: none;
-        }
-        .hidden { display: none !important; }
-        .greeting {
-            font-size: 1.3em;
-            margin: 10px 0;
-            color: var(--accent-color);
-            font-weight: bold;
-        }
+        .theme-dark{--bg-color:#1a1a1a;--text-color:#f0f0f0;--container-bg:#2d2d2d;--output-bg:#3a3a3a;--output-border:#555;}
+        .font-mono{--font-family:'Courier New',monospace;}
+        .size-small{--font-size:14px;--padding:12px;}
+        .size-large{--font-size:18px;--padding:28px;}
+        .no-border{--border:none;}
+        .no-shadow{--shadow:none;}
+        .layout-grid{display:grid;grid-template-columns:1fr;gap:20px;}
+        .layout-card{max-width:420px;margin:40px auto;}
+        .layout-list{max-width:800px;}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        @keyframes slideIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+        .animate-fade{animation:fadeIn .6s ease-out;}
+        .animate-slide{animation:slideIn .6s ease-out;}
+        body{font-family:var(--font-family);margin:0;background:var(--bg-color);color:var(--text-color);font-size:var(--font-size);transition:var(--transition);min-height:100vh;}
+        .container{max-width:600px;margin:40px auto;padding:var(--padding);background:var(--container-bg);border:var(--border);border-radius:8px;box-shadow:var(--shadow);transition:var(--transition);}
+        h1{color:var(--accent-color);margin-top:0;font-size:2em;}
+        #output{margin-top:20px;padding:15px;background:var(--output-bg);border:1px solid var(--output-border);border-radius:4px;font-family:monospace;line-height:1.6;}
+        form{margin-top:20px;}
+        input[type=text]{width:68%;padding:8px;margin-right:10px;border:1px solid #ccc;border-radius:4px;font-family:inherit;font-size:.95em;}
+        button{padding:8px 16px;background:var(--accent-color);color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:inherit;transition:.2s;}
+        button:hover{opacity:.9;}
+        .example{margin:15px 0;font-size:.9em;color:#666;}
+        .example code{background:#eee;padding:2px 6px;border-radius:3px;font-family:monospace;}
+        .debug-panel{margin-top:20px;padding:12px;background:#fff3cd;border:1px solid #ffeaa7;border-radius:4px;font-family:monospace;font-size:.8em;display:none;}
+        .hidden{display:none !important;}
+        .greeting{font-size:1.3em;margin:10px 0;color:var(--accent-color);font-weight:bold;}
+        .preset-section{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+        .preset-section select,.preset-section input{max-width:150px;}
+        .qr-section{margin-top:20px;text-align:center;}
+        #qrCanvas{display:block;margin:10px auto;max-width:200px;}
     </style>
 </head>
 <body>
-    <div class="container" id="mainContainer">
-        <h1 id="pageTitle">Query Parameter Pro</h1>
-        <div id="greeting" class="greeting hidden"></div>
-        <p id="description">This page is fully controlled by URL parameters. Change anything instantly!</p>
+<div class="container" id="mainContainer">
+    <h1 id="pageTitle">Query Parameter Ultimate</h1>
+    <div id="greeting" class="greeting hidden"></div>
+    <p id="description">All styling, content, and behaviour are driven by URL query parameters.</p>
 
-        <div class="example">
-            <strong>Try combining:</strong><br>
-            <code>theme=dark</code> |
-            <code>layout=card</code> |
-            <code>size=large</code> |
-            <code>lang=es</code> |
-            <code>greeting=¡Hola!</code>
-        </div>
-
-        <div id="output">
-            <strong>Active Settings:</strong><br>
-            <span id="params">Loading...</span>
-        </div>
-
-        <form id="queryForm">
-            <input type="text" id="queryInput" placeholder="e.g., theme=dark&layout=card&lang=fr&size=large" />
-            <button type="submit">Apply</button>
-        </form>
-
-        <div id="debugPanel" class="debug-panel"></div>
-
-        <p><small>All changes are client-side. Share the URL to share the config!</small></p>
+    <div class="example">
+        <strong>Try:</strong><br>
+        <code>theme=dark&amp;layout=card&amp;lang=es&amp;size=large</code>
     </div>
 
-    <script>
-        const paramsDisplay = document.getElementById('params');
-        const pageTitle = document.getElementById('pageTitle');
-        const description = document.getElementById('description');
-        const greeting = document.getElementById('greeting');
-        const container = document.getElementById('mainContainer');
-        const debugPanel = document.getElementById('debugPanel');
-        const root = document.documentElement;
-        const body = document.body;
+    <div id="output">
+        <strong>Active Settings:</strong><br><span id="params">Loading…</span>
+    </div>
 
-        // Translations
-        const translations = {
-            en: { title: "Query Parameter Pro", desc: "This page is fully controlled by URL parameters. Change anything instantly!", greeting: "Welcome!" },
-            es: { title: "Parámetros Pro", desc: "¡Esta página se controla totalmente con parámetros en la URL!", greeting: "¡Bienvenido!" },
-            fr: { title: "Paramètres Pro", desc: "Cette page est entièrement contrôlée par les paramètres d'URL.", greeting: "Bienvenue !" }
-        };
+    <form id="queryForm">
+        <input type="text" id="queryInput" placeholder="e.g. theme=dark&amp;layout=card">
+        <button type="submit">Apply</button>
+    </form>
 
-        function applyParams(params) {
-            // Reset
-            body.className = '';
-            container.className = 'container';
-            debugPanel.style.display = 'none';
-            greeting.classList.add('hidden');
-            let applied = [];
-            let debug = [];
+    <!-- ==== PRESETS ==== -->
+    <div class="preset-section">
+        <input type="text" id="presetName" placeholder="Preset name">
+        <button id="savePreset">Save Preset</button>
+        <select id="loadPreset"><option value="">— Load Preset —</option></select>
+        <button id="deletePreset" disabled>Delete</button>
+    </div>
 
-            // Language
-            const lang = params.get('lang') || 'en';
-            const t = translations[lang] || translations.en;
-            pageTitle.textContent = params.get('title') || t.title;
-            document.title = pageTitle.textContent;
-            description.textContent = t.desc;
+    <!-- ==== EXPORT / QR ==== -->
+    <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+        <button id="exportJson">Export JSON</button>
+        <button id="showQr">Show QR Code</button>
+    </div>
+    <div class="qr-section hidden" id="qrSection">
+        <canvas id="qrCanvas"></canvas>
+        <p><small>Scan to open this exact configuration on another device.</small></p>
+    </div>
 
-            // Greeting
-            const greetText = params.get('greeting');
-            if (greetText) {
-                greeting.textContent = decodeURIComponent(greetText.replace(/\+/g, ' '));
-                greeting.classList.remove('hidden');
-                applied.push(`greeting: "${greeting.textContent}"`);
-            } else {
-                greeting.textContent = t.greeting;
-                greeting.classList.remove('hidden');
-            }
+    <div id="debugPanel" class="debug-panel"></div>
 
-            // Theme
-            const theme = params.get('theme');
-            if (theme === 'dark') {
-                body.classList.add('theme-dark');
-                applied.push('theme: dark');
-            } else if (theme === 'light') {
-                applied.push('theme: light');
-            }
+    <p><small>All changes are client-side – share the URL!</small></p>
+</div>
 
-            // Font
-            const font = params.get('font');
-            if (font === 'mono') {
-                body.classList.add('font-mono');
-                applied.push('font: monospace');
-            }
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+/* ---------- Core Elements ---------- */
+const els = {
+    params: document.getElementById('params'),
+    title: document.getElementById('pageTitle'),
+    desc: document.getElementById('description'),
+    greeting: document.getElementById('greeting'),
+    container: document.getElementById('mainContainer'),
+    debug: document.getElementById('debugPanel'),
+    queryForm: document.getElementById('queryForm'),
+    queryInput: document.getElementById('queryInput'),
+    presetName: document.getElementById('presetName'),
+    savePreset: document.getElementById('savePreset'),
+    loadPreset: document.getElementById('loadPreset'),
+    deletePreset: document.getElementById('deletePreset'),
+    exportJson: document.getElementById('exportJson'),
+    showQr: document.getElementById('showQr'),
+    qrSection: document.getElementById('qrSection'),
+    qrCanvas: document.getElementById('qrCanvas')
+};
+const root = document.documentElement;
+const body = document.body;
 
-            // Size
-            const size = params.get('size');
-            if (size === 'small') {
-                body.classList.add('size-small');
-                applied.push('size: small');
-            } else if (size === 'large') {
-                body.classList.add('size-large');
-                applied.push('size: large');
-            }
+/* ---------- Translations ---------- */
+const i18n = {
+    en:{title:"Query Parameter Ultimate",desc:"All styling, content, and behaviour are driven by URL query parameters.",greeting:"Welcome!"},
+    es:{title:"Parámetros Ultimate",desc:"¡Todo el estilo, contenido y comportamiento se controla mediante parámetros de URL!",greeting:"¡Bienvenido!"},
+    fr:{title:"Paramètres Ultimate",desc:"Tout le style, le contenu et le comportement sont pilotés par les paramètres d’URL.",greeting:"Bienvenue !"}
+};
 
-            // Layout
-            const layout = params.get('layout');
-            if (['grid', 'card', 'list'].includes(layout)) {
-                container.classList.add(`layout-${layout}`);
-                applied.push(`layout: ${layout}`);
-            }
+/* ---------- Apply Parameters ---------- */
+function apply(params){
+    // reset
+    body.className = '';
+    els.container.className = 'container';
+    els.debug.style.display='none';
+    els.greeting.classList.add('hidden');
+    let applied = [];
 
-            // Border & Shadow
-            if (params.get('border') === '0') {
-                body.classList.add('no-border');
-                applied.push('border: off');
-            }
-            if (params.get('shadow') === '0') {
-                body.classList.add('no-shadow');
-                applied.push('shadow: off');
-            }
+    // language
+    const lang = params.get('lang')||'en';
+    const t = i18n[lang]||i18n.en;
+    els.title.textContent = params.get('title')||t.title;
+    document.title = els.title.textContent;
+    els.desc.textContent = t.desc;
 
-            // Animation
-            const anim = params.get('animation');
-            if (anim === 'fade') {
-                container.classList.add('animate-fade');
-                applied.push('animation: fade');
-            } else if (anim === 'slide') {
-                container.classList.add('animate-slide');
-                applied.push('animation: slide');
-            }
+    // greeting
+    const greet = params.get('greeting');
+    if(greet){
+        els.greeting.textContent = decodeURIComponent(greet.replace(/\+/g,' '));
+        applied.push(`greeting: "${els.greeting.textContent}"`);
+    }else{
+        els.greeting.textContent = t.greeting;
+    }
+    els.greeting.classList.remove('hidden');
 
-            // Hide elements
-            const hide = params.get('hide');
-            if (hide === 'title') pageTitle.classList.add('hidden');
-            if (hide === 'form') document.getElementById('queryForm').classList.add('hidden');
+    // theme
+    if(params.get('theme')==='dark'){body.classList.add('theme-dark');applied.push('theme: dark');}
+    else if(params.get('theme')==='light') applied.push('theme: light');
 
-            // Background & Accent
-            const bgcolor = params.get('bgcolor');
-            if (bgcolor && /^#[0-9A-Fa-f]{6}$/.test(bgcolor)) {
-                root.style.setProperty('--bg-color', bgcolor);
-                applied.push(`bgcolor: ${bgcolor}`);
-            }
-            const accent = params.get('accent');
-            if (accent && /^#[0-9A-Fa-f]{6}$/.test(accent)) {
-                root.style.setProperty('--accent-color', accent);
-                applied.push(`accent: ${accent}`);
-            }
+    // font
+    if(params.get('font')==='mono'){body.classList.add('font-mono');applied.push('font: monospace');}
 
-            // Debug Mode
-            if (params.get('debug') === '1') {
-                debugPanel.style.display = 'block';
-                debugPanel.innerHTML = `<strong>Debug:</strong><br>URL: ${location.href}<br>User-Agent: ${navigator.userAgent.split(' ').slice(0,3).join(' ')}...`;
-                applied.push('debug: on');
-            }
+    // size
+    if(params.get('size')==='small'){body.classList.add('size-small');applied.push('size: small');}
+    else if(params.get('size')==='large'){body.classList.add('size-large');applied.push('size: large');}
 
-            // Display
-            paramsDisplay.innerHTML = applied.length ? applied.join('<br>') : 'Default settings';
-            if (params.toString()) {
-                paramsDisplay.innerHTML += `<br><br><small><strong>All params:</strong> ${Array.from(params).map(p => p.join('=')).join(', ')}</small>`;
-            }
-        }
+    // layout
+    const layout = params.get('layout');
+    if(['grid','card','list'].includes(layout)){
+        els.container.classList.add(`layout-${layout}`);
+        applied.push(`layout: ${layout}`);
+    }
 
-        function updateFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            applyParams(urlParams);
-        }
+    // border / shadow
+    if(params.get('border')==='0'){body.classList.add('no-border');applied.push('border: off');}
+    if(params.get('shadow')==='0'){body.classList.add('no-shadow');applied.push('shadow: off');}
 
-        // Init
-        window.onload = updateFromURL;
+    // animation
+    const anim = params.get('animation');
+    if(anim==='fade'){els.container.classList.add('animate-fade');applied.push('animation: fade');}
+    else if(anim==='slide'){els.container.classList.add('animate-slide');applied.push('animation: slide');}
 
-        // Form
-        document.getElementById('queryForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const input = document.getElementById('queryInput').value.trim();
-            const base = location.href.split('?')[0];
-            const newUrl = input ? `${base}?${input}` : base;
-            history.pushState({}, '', newUrl);
-            updateFromURL();
+    // hide
+    const hide = params.get('hide');
+    if(hide==='title') els.title.classList.add('hidden');
+    if(hide==='form') els.queryForm.classList.add('hidden');
+
+    // colors
+    const bg = params.get('bgcolor');
+    if(bg && /^#[0-9A-Fa-f]{6}$/i.test(bg)){root.style.setProperty('--bg-color',bg);applied.push(`bgcolor: ${bg}`);}
+    const ac = params.get('accent');
+    if(ac && /^#[0-9A-Fa-f]{6}$/i.test(ac)){root.style.setProperty('--accent-color',ac);applied.push(`accent: ${ac}`);}
+
+    // debug
+    if(params.get('debug')==='1'){
+        els.debug.style.display='block';
+        els.debug.innerHTML=`<strong>Debug:</strong><br>URL: ${location.href}<br>UA: ${navigator.userAgent.split(' ').slice(0,3).join(' ')}…`;
+        applied.push('debug: on');
+    }
+
+    // display
+    els.params.innerHTML = applied.length ? applied.join('<br>') : 'Default settings';
+    if(params.toString()){
+        els.params.innerHTML += `<br><br><small><strong>All params:</strong> ${Array.from(params).map(p=>p.join('=')).join(', ')}</small>`;
+    }
+}
+
+/* ---------- URL Handling ---------- */
+function updateFromURL(){
+    const p = new URLSearchParams(location.search);
+    apply(p);
+    refreshPresetsUI();
+}
+window.onload = updateFromURL;
+window.onpopstate = updateFromURL;
+
+els.queryForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    const input = els.queryInput.value.trim();
+    const base = location.href.split('?')[0];
+    const url = input ? `${base}?${input}` : base;
+    history.pushState({},"",url);
+    updateFromURL();
+});
+
+/* ---------- Presets (localStorage) ---------- */
+const STORAGE_KEY = 'queryParamPresets';
+function getPresets(){return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');}
+function savePresets(obj){localStorage.setItem(STORAGE_KEY,JSON.stringify(obj));}
+
+function refreshPresetsUI(){
+    const presets = getPresets();
+    const sel = els.loadPreset;
+    sel.innerHTML = '<option value="">— Load Preset —</option>';
+    Object.keys(presets).forEach(name=>{
+        const opt = document.createElement('option');
+        opt.value = name; opt.textContent = name;
+        sel.appendChild(opt);
+    });
+    els.deletePreset.disabled = !sel.value;
+}
+refreshPresetsUI();
+
+els.savePreset.addEventListener('click',()=>{
+    const name = els.presetName.value.trim();
+    if(!name) return alert('Enter a preset name');
+    const presets = getPresets();
+    if(Object.keys(presets).length>=5) return alert('Max 5 presets allowed');
+    presets[name] = location.search.substring(1);
+    savePresets(presets);
+    els.presetName.value='';
+    refreshPresetsUI();
+    alert(`Preset "${name}" saved`);
+});
+
+els.loadPreset.addEventListener('change',()=>{
+    const name = els.loadPreset.value;
+    if(!name) return;
+    const presets = getPresets();
+    const qs = presets[name];
+    const base = location.href.split('?')[0];
+    history.pushState({},"", qs ? `${base}?${qs}` : base);
+    updateFromURL();
+});
+
+els.deletePreset.addEventListener('click',()=>{
+    const name = els.loadPreset.value;
+    if(!name) return;
+    if(!confirm(`Delete preset "${name}"?`)) return;
+    const presets = getPresets();
+    delete presets[name];
+    savePresets(presets);
+    refreshPresetsUI();
+});
+
+/* ---------- Export JSON ---------- */
+els.exportJson.addEventListener('click',()=>{
+    const params = new URLSearchParams(location.search);
+    const obj = {};
+    for(const [k,v] of params) obj[k]=v;
+    const data = JSON.stringify(obj,null,2);
+    const blob = new Blob([data],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href=url; a.download='query-config.json';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+/* ---------- QR Code ---------- */
+els.showQr.addEventListener('click',()=>{
+    els.qrSection.classList.toggle('hidden');
+    if(!els.qrSection.classList.contains('hidden')){
+        QRCode.toCanvas(els.qrCanvas, location.href, {width:200,errorCorrectionLevel:'H'}, err=>{
+            if(err) console.error(err);
         });
+    }
+});
 
-        // History navigation
-        window.onpopstate = updateFromURL;
-    </script>
+/* ---------- Enable delete button when preset selected ---------- */
+els.loadPreset.addEventListener('change',()=>els.deletePreset.disabled=!els.loadPreset.value);
+</script>
 </body>
 </html>
