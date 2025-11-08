@@ -5,107 +5,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Query Parameter Test</title>
     <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --accent-color: #3498db;
+            --container-bg: white;
+            --output-bg: #eef;
+            --output-border: #ccf;
+            --font-family: Arial, sans-serif;
+        }
+
+        .theme-dark {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --container-bg: #2d2d2d;
+            --output-bg: #3a3a3a;
+            --output-border: #555;
+        }
+
+        .font-mono {
+            --font-family: 'Courier New', monospace;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             max-width: 600px;
-            margin: auto;
+            margin: 40px auto;
             padding: 20px;
-            background: white;
+            background: var(--container-bg);
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
-            color: #2c3e50;
+            color: var(--accent-color);
+            margin-top: 0;
         }
         #output {
             margin-top: 20px;
             padding: 15px;
-            background: #eef;
-            border: 1px solid #ccf;
+            background: var(--output-bg);
+            border: 1px solid var(--output-border);
             border-radius: 4px;
             font-family: monospace;
+            color: var(--text-color);
         }
         form {
             margin-top: 20px;
         }
         input[type="text"] {
-            width: 70%;
+            width: 68%;
             padding: 8px;
             margin-right: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-family: inherit;
         }
         button {
             padding: 8px 16px;
-            background: #3498db;
+            background: var(--accent-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            font-family: inherit;
         }
         button:hover {
-            background: #2980b9;
+            opacity: 0.9;
+        }
+        .example {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .example code {
+            background: #eee;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>URL Query Parameter Test</h1>
-        <p>This page reads and displays query parameters from the URL. Try adding parameters like:</p>
-        <code>?name=John&amp;age=30&amp;city=New+York</code>
+        <h1 id="pageTitle">Query Parameter Test</h1>
+        <p>This page dynamically applies styles and content based on URL query parameters.</p>
+
+        <div class="example">
+            <strong>Try these:</strong><br>
+            <code>?theme=dark</code> |
+            <code>?theme=light</code> |
+            <code>?title=Hello+World</code> |
+            <code>?bgcolor=%23ff6b6b</code> |
+            <code>?accent=%2348c774</code> |
+            <code>?font=mono</code>
+        </div>
 
         <div id="output">
-            <strong>Current Query Parameters:</strong><br>
-            <span id="params">No parameters detected.</span>
+            <strong>Active Parameters:</strong><br>
+            <span id="params">Loading...</span>
         </div>
 
         <form id="queryForm">
-            <input type="text" id="queryInput" placeholder="Enter query string (e.g., name=Alice&job=Engineer)" />
-            <button type="submit">Update URL</button>
+            <input type="text" id="queryInput" placeholder="e.g., theme=dark&title=My+Site&font=mono" />
+            <button type="submit">Apply Parameters</button>
         </form>
 
-        <p><small><strong>Instructions:</strong> Enter key-value pairs in the input above and click "Update URL" to see them reflected.</small></p>
+        <p><small>Changes update the URL and apply instantly without reload.</small></p>
     </div>
 
     <script>
-        function parseQueryString(query) {
-            const params = new URLSearchParams(query);
-            let output = '';
-            if (params.toString() === '') {
-                output = 'No parameters detected.';
-            } else {
-                for (const [key, value] of params) {
-                    output += `<strong>${key}:</strong> ${value}<br>`;
-                }
+        const paramsDisplay = document.getElementById('params');
+        const pageTitle = document.getElementById('pageTitle');
+        const root = document.documentElement;
+        const body = document.body;
+
+        function applyTheme(params) {
+            // Reset classes
+            body.classList.remove('theme-dark', 'font-mono');
+
+            let applied = [];
+
+            // Theme
+            const theme = params.get('theme');
+            if (theme === 'dark') {
+                body.classList.add('theme-dark');
+                applied.push(`theme: dark`);
+            } else if (theme === 'light') {
+                applied.push(`theme: light`);
             }
-            return output;
+
+            // Title
+            const title = params.get('title');
+            if (title) {
+                const decoded = decodeURIComponent(title.replace(/\+/g, ' '));
+                pageTitle.textContent = decoded;
+                document.title = decoded;
+                applied.push(`title: "${decoded}"`);
+            }
+
+            // Background color
+            const bgcolor = params.get('bgcolor');
+            if (bgcolor && /^#[0-9A-Fa-f]{6}$/.test(bgcolor)) {
+                root.style.setProperty('--bg-color', bgcolor);
+                applied.push(`bgcolor: ${bgcolor}`);
+            }
+
+            // Accent color
+            const accent = params.get('accent');
+            if (accent && /^#[0-9A-Fa-f]{6}$/.test(accent)) {
+                root.style.setProperty('--accent-color', accent);
+                applied.push(`accent: ${accent}`);
+            }
+
+            // Font
+            const font = params.get('font');
+            if (font === 'mono') {
+                body.classList.add('font-mono');
+                applied.push(`font: monospace`);
+            } else if (font === 'sans') {
+                applied.push(`font: sans-serif`);
+            }
+
+            // Display all active params
+            if (applied.length === 0) {
+                paramsDisplay.innerHTML = 'No recognized parameters.';
+            있지만 } else {
+                paramsDisplay.innerHTML = applied.join('<br>');
+            }
+
+            // Also show raw params
+            const raw = [];
+            for (const [key, value] of params) {
+                raw.push(`${key}=${value}`);
+            }
+            if (raw.length > 0) {
+                paramsDisplay.innerHTML += `<br><br><small><strong>All params:</strong> ${raw.join(', ')}</small>`;
+            }
         }
 
-        function updateParams() {
+        function updateFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
-            document.getElementById('params').innerHTML = parseQueryString(urlParams.toString());
+            applyTheme(urlParams);
         }
 
-        // Update on page load
-        window.onload = updateParams;
+        // Initial load
+        window.onload = updateFromURL;
 
-        // Form submission to update URL without reload
+        // Form handler
         document.getElementById('queryForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const input = document.getElementById('queryInput').value.trim();
             const baseUrl = window.location.href.split('?')[0];
             const newUrl = input ? `${baseUrl}?${input}` : baseUrl;
             window.history.pushState({}, '', newUrl);
-            updateParams();
+            updateFromURL();
         });
 
-        // Listen for back/forward navigation
-        window.onpopstate = updateParams;
+        // Handle back/forward
+        window.onpopstate = updateFromURL;
     </script>
 </body>
 </html>
