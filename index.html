@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Query Parameter Test</title>
+    <title>Query Parameter Pro</title>
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -13,6 +13,11 @@
             --output-bg: #eef;
             --output-border: #ccf;
             --font-family: Arial, sans-serif;
+            --font-size: 16px;
+            --padding: 20px;
+            --border: 1px solid #ddd;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --transition: all 0.4s ease;
         }
 
         .theme-dark {
@@ -23,28 +28,46 @@
             --output-border: #555;
         }
 
-        .font-mono {
-            --font-family: 'Courier New', monospace;
-        }
+        .font-mono { --font-family: 'Courier New', monospace; }
+        .size-small { --font-size: 14px; --padding: 12px; }
+        .size-large { --font-size: 18px; --padding: 28px; }
+        .no-border { --border: none; }
+        .no-shadow { --shadow: none; }
+
+        /* Layouts */
+        .layout-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .layout-card { max-width: 400px; margin: 40px auto; }
+        .layout-list { max-width: 800px; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .animate-fade { animation: fadeIn 0.6s ease-out; }
+        .animate-slide { animation: slideIn 0.6s ease-out; }
 
         body {
             font-family: var(--font-family);
             margin: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
+            font-size: var(--font-size);
+            transition: var(--transition);
+            min-height: 100vh;
         }
         .container {
             max-width: 600px;
             margin: 40px auto;
-            padding: 20px;
+            padding: var(--padding);
             background: var(--container-bg);
+            border: var(--border);
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
         }
         h1 {
             color: var(--accent-color);
             margin-top: 0;
+            font-size: 2em;
         }
         #output {
             margin-top: 20px;
@@ -54,6 +77,7 @@
             border-radius: 4px;
             font-family: monospace;
             color: var(--text-color);
+            line-height: 1.6;
         }
         form {
             margin-top: 20px;
@@ -65,6 +89,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             font-family: inherit;
+            font-size: 0.95em;
         }
         button {
             padding: 8px 16px;
@@ -74,140 +99,207 @@
             border-radius: 4px;
             cursor: pointer;
             font-family: inherit;
+            transition: 0.2s;
         }
-        button:hover {
-            opacity: 0.9;
-        }
-        .example {
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #666;
-        }
-        .example code {
-            background: #eee;
-            padding: 2px 6px;
-            border-radius: 3px;
+        button:hover { opacity: 0.9; }
+        .example { margin: 15px 0; font-size: 0.9em; color: #666; }
+        .example code { background: #eee; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        .debug-panel {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
             font-family: monospace;
+            font-size: 0.8em;
+            display: none;
+        }
+        .hidden { display: none !important; }
+        .greeting {
+            font-size: 1.3em;
+            margin: 10px 0;
+            color: var(--accent-color);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="pageTitle">Query Parameter Test</h1>
-        <p>This page dynamically applies styles and content based on URL query parameters.</p>
+    <div class="container" id="mainContainer">
+        <h1 id="pageTitle">Query Parameter Pro</h1>
+        <div id="greeting" class="greeting hidden"></div>
+        <p id="description">This page is fully controlled by URL parameters. Change anything instantly!</p>
 
         <div class="example">
-            <strong>Try these:</strong><br>
-            <code>?theme=dark</code> |
-            <code>?theme=light</code> |
-            <code>?title=Hello+World</code> |
-            <code>?bgcolor=%23ff6b6b</code> |
-            <code>?accent=%2348c774</code> |
-            <code>?font=mono</code>
+            <strong>Try combining:</strong><br>
+            <code>theme=dark</code> |
+            <code>layout=card</code> |
+            <code>size=large</code> |
+            <code>lang=es</code> |
+            <code>greeting=¡Hola!</code>
         </div>
 
         <div id="output">
-            <strong>Active Parameters:</strong><br>
+            <strong>Active Settings:</strong><br>
             <span id="params">Loading...</span>
         </div>
 
         <form id="queryForm">
-            <input type="text" id="queryInput" placeholder="e.g., theme=dark&title=My+Site&font=mono" />
-            <button type="submit">Apply Parameters</button>
+            <input type="text" id="queryInput" placeholder="e.g., theme=dark&layout=card&lang=fr&size=large" />
+            <button type="submit">Apply</button>
         </form>
 
-        <p><small>Changes update the URL and apply instantly without reload.</small></p>
+        <div id="debugPanel" class="debug-panel"></div>
+
+        <p><small>All changes are client-side. Share the URL to share the config!</small></p>
     </div>
 
     <script>
         const paramsDisplay = document.getElementById('params');
         const pageTitle = document.getElementById('pageTitle');
+        const description = document.getElementById('description');
+        const greeting = document.getElementById('greeting');
+        const container = document.getElementById('mainContainer');
+        const debugPanel = document.getElementById('debugPanel');
         const root = document.documentElement;
         const body = document.body;
 
-        function applyTheme(params) {
-            // Reset classes
-            body.classList.remove('theme-dark', 'font-mono');
+        // Translations
+        const translations = {
+            en: { title: "Query Parameter Pro", desc: "This page is fully controlled by URL parameters. Change anything instantly!", greeting: "Welcome!" },
+            es: { title: "Parámetros Pro", desc: "¡Esta página se controla totalmente con parámetros en la URL!", greeting: "¡Bienvenido!" },
+            fr: { title: "Paramètres Pro", desc: "Cette page est entièrement contrôlée par les paramètres d'URL.", greeting: "Bienvenue !" }
+        };
 
+        function applyParams(params) {
+            // Reset
+            body.className = '';
+            container.className = 'container';
+            debugPanel.style.display = 'none';
+            greeting.classList.add('hidden');
             let applied = [];
+            let debug = [];
+
+            // Language
+            const lang = params.get('lang') || 'en';
+            const t = translations[lang] || translations.en;
+            pageTitle.textContent = params.get('title') || t.title;
+            document.title = pageTitle.textContent;
+            description.textContent = t.desc;
+
+            // Greeting
+            const greetText = params.get('greeting');
+            if (greetText) {
+                greeting.textContent = decodeURIComponent(greetText.replace(/\+/g, ' '));
+                greeting.classList.remove('hidden');
+                applied.push(`greeting: "${greeting.textContent}"`);
+            } else {
+                greeting.textContent = t.greeting;
+                greeting.classList.remove('hidden');
+            }
 
             // Theme
             const theme = params.get('theme');
             if (theme === 'dark') {
                 body.classList.add('theme-dark');
-                applied.push(`theme: dark`);
+                applied.push('theme: dark');
             } else if (theme === 'light') {
-                applied.push(`theme: light`);
-            }
-
-            // Title
-            const title = params.get('title');
-            if (title) {
-                const decoded = decodeURIComponent(title.replace(/\+/g, ' '));
-                pageTitle.textContent = decoded;
-                document.title = decoded;
-                applied.push(`title: "${decoded}"`);
-            }
-
-            // Background color
-            const bgcolor = params.get('bgcolor');
-            if (bgcolor && /^#[0-9A-Fa-f]{6}$/.test(bgcolor)) {
-                root.style.setProperty('--bg-color', bgcolor);
-                applied.push(`bgcolor: ${bgcolor}`);
-            }
-
-            // Accent color
-            const accent = params.get('accent');
-            if (accent && /^#[0-9A-Fa-f]{6}$/.test(accent)) {
-                root.style.setProperty('--accent-color', accent);
-                applied.push(`accent: ${accent}`);
+                applied.push('theme: light');
             }
 
             // Font
             const font = params.get('font');
             if (font === 'mono') {
                 body.classList.add('font-mono');
-                applied.push(`font: monospace`);
-            } else if (font === 'sans') {
-                applied.push(`font: sans-serif`);
+                applied.push('font: monospace');
             }
 
-            // Display all active params
-            if (applied.length === 0) {
-                paramsDisplay.innerHTML = 'No recognized parameters.';
-            있지만 } else {
-                paramsDisplay.innerHTML = applied.join('<br>');
+            // Size
+            const size = params.get('size');
+            if (size === 'small') {
+                body.classList.add('size-small');
+                applied.push('size: small');
+            } else if (size === 'large') {
+                body.classList.add('size-large');
+                applied.push('size: large');
             }
 
-            // Also show raw params
-            const raw = [];
-            for (const [key, value] of params) {
-                raw.push(`${key}=${value}`);
+            // Layout
+            const layout = params.get('layout');
+            if (['grid', 'card', 'list'].includes(layout)) {
+                container.classList.add(`layout-${layout}`);
+                applied.push(`layout: ${layout}`);
             }
-            if (raw.length > 0) {
-                paramsDisplay.innerHTML += `<br><br><small><strong>All params:</strong> ${raw.join(', ')}</small>`;
+
+            // Border & Shadow
+            if (params.get('border') === '0') {
+                body.classList.add('no-border');
+                applied.push('border: off');
+            }
+            if (params.get('shadow') === '0') {
+                body.classList.add('no-shadow');
+                applied.push('shadow: off');
+            }
+
+            // Animation
+            const anim = params.get('animation');
+            if (anim === 'fade') {
+                container.classList.add('animate-fade');
+                applied.push('animation: fade');
+            } else if (anim === 'slide') {
+                container.classList.add('animate-slide');
+                applied.push('animation: slide');
+            }
+
+            // Hide elements
+            const hide = params.get('hide');
+            if (hide === 'title') pageTitle.classList.add('hidden');
+            if (hide === 'form') document.getElementById('queryForm').classList.add('hidden');
+
+            // Background & Accent
+            const bgcolor = params.get('bgcolor');
+            if (bgcolor && /^#[0-9A-Fa-f]{6}$/.test(bgcolor)) {
+                root.style.setProperty('--bg-color', bgcolor);
+                applied.push(`bgcolor: ${bgcolor}`);
+            }
+            const accent = params.get('accent');
+            if (accent && /^#[0-9A-Fa-f]{6}$/.test(accent)) {
+                root.style.setProperty('--accent-color', accent);
+                applied.push(`accent: ${accent}`);
+            }
+
+            // Debug Mode
+            if (params.get('debug') === '1') {
+                debugPanel.style.display = 'block';
+                debugPanel.innerHTML = `<strong>Debug:</strong><br>URL: ${location.href}<br>User-Agent: ${navigator.userAgent.split(' ').slice(0,3).join(' ')}...`;
+                applied.push('debug: on');
+            }
+
+            // Display
+            paramsDisplay.innerHTML = applied.length ? applied.join('<br>') : 'Default settings';
+            if (params.toString()) {
+                paramsDisplay.innerHTML += `<br><br><small><strong>All params:</strong> ${Array.from(params).map(p => p.join('=')).join(', ')}</small>`;
             }
         }
 
         function updateFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
-            applyTheme(urlParams);
+            applyParams(urlParams);
         }
 
-        // Initial load
+        // Init
         window.onload = updateFromURL;
 
-        // Form handler
+        // Form
         document.getElementById('queryForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const input = document.getElementById('queryInput').value.trim();
-            const baseUrl = window.location.href.split('?')[0];
-            const newUrl = input ? `${baseUrl}?${input}` : baseUrl;
-            window.history.pushState({}, '', newUrl);
+            const base = location.href.split('?')[0];
+            const newUrl = input ? `${base}?${input}` : base;
+            history.pushState({}, '', newUrl);
             updateFromURL();
         });
 
-        // Handle back/forward
+        // History navigation
         window.onpopstate = updateFromURL;
     </script>
 </body>
