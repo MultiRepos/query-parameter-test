@@ -45,10 +45,24 @@
         .debug-panel{margin-top:20px;padding:12px;background:#fff3cd;border:1px solid #ffeaa7;border-radius:4px;font-family:monospace;font-size:.8em;display:none;}
         .hidden{display:none !important;}
         .greeting{font-size:1.3em;margin:10px 0;color:var(--accent-color);font-weight:bold;}
-        .preset-section{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-        .preset-section select,.preset-section input{max-width:150px;}
+        .preset-section{margin-top:20px;}
+        .preset-input{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+        .preset-input input{flex:1;min-width:120px;}
+        .preset-list{margin-top:8px;}
+        .preset-item{
+            display:flex;justify-content:space-between;align-items:center;
+            padding:8px 12px;background:var(--output-bg);border:1px solid var(--output-border);
+            border-radius:4px;margin-bottom:6px;font-size:0.9em;
+        }
+        .preset-item button{
+            padding:4px 8px;font-size:0.8em;margin-left:4px;
+        }
+        .preset-item .delete-btn{
+            background:#e74c3c;color:white;
+        }
+        .preset-item .delete-btn:hover{opacity:0.9;}
         .qr-section{margin-top:20px;text-align:center;}
-        #qrCanvas{display:block;margin:10px auto;max-width:200px;}
+        #qrCanvas{display:block;margin:10px auto;max-width:200px;border:1px solid #ddd;border-radius:4px;}
     </style>
 </head>
 <body>
@@ -73,10 +87,11 @@
 
     <!-- ==== PRESETS ==== -->
     <div class="preset-section">
-        <input type="text" id="presetName" placeholder="Preset name">
-        <button id="savePreset">Save Preset</button>
-        <select id="loadPreset"><option value="">— Load Preset —</option></select>
-        <button id="deletePreset" disabled>Delete</button>
+        <div class="preset-input">
+            <input type="text" id="presetName" placeholder="Preset name">
+            <button id="savePreset">Save Preset</button>
+        </div>
+        <div id="presetList" class="preset-list"></div>
     </div>
 
     <!-- ==== EXPORT / QR ==== -->
@@ -108,8 +123,7 @@ const els = {
     queryInput: document.getElementById('queryInput'),
     presetName: document.getElementById('presetName'),
     savePreset: document.getElementById('savePreset'),
-    loadPreset: document.getElementById('loadPreset'),
-    deletePreset: document.getElementById('deletePreset'),
+    presetList: document.getElementById('presetList'),
     exportJson: document.getElementById('exportJson'),
     showQr: document.getElementById('showQr'),
     qrSection: document.getElementById('qrSection'),
@@ -127,21 +141,18 @@ const i18n = {
 
 /* ---------- Apply Parameters ---------- */
 function apply(params){
-    // reset
     body.className = '';
     els.container.className = 'container';
     els.debug.style.display='none';
     els.greeting.classList.add('hidden');
     let applied = [];
 
-    // language
     const lang = params.get('lang')||'en';
     const t = i18n[lang]||i18n.en;
     els.title.textContent = params.get('title')||t.title;
     document.title = els.title.textContent;
     els.desc.textContent = t.desc;
 
-    // greeting
     const greet = params.get('greeting');
     if(greet){
         els.greeting.textContent = decodeURIComponent(greet.replace(/\+/g,' '));
@@ -151,52 +162,42 @@ function apply(params){
     }
     els.greeting.classList.remove('hidden');
 
-    // theme
     if(params.get('theme')==='dark'){body.classList.add('theme-dark');applied.push('theme: dark');}
     else if(params.get('theme')==='light') applied.push('theme: light');
 
-    // font
     if(params.get('font')==='mono'){body.classList.add('font-mono');applied.push('font: monospace');}
 
-    // size
     if(params.get('size')==='small'){body.classList.add('size-small');applied.push('size: small');}
     else if(params.get('size')==='large'){body.classList.add('size-large');applied.push('size: large');}
 
-    // layout
     const layout = params.get('layout');
     if(['grid','card','list'].includes(layout)){
         els.container.classList.add(`layout-${layout}`);
         applied.push(`layout: ${layout}`);
     }
 
-    // border / shadow
     if(params.get('border')==='0'){body.classList.add('no-border');applied.push('border: off');}
     if(params.get('shadow')==='0'){body.classList.add('no-shadow');applied.push('shadow: off');}
 
-    // animation
     const anim = params.get('animation');
     if(anim==='fade'){els.container.classList.add('animate-fade');applied.push('animation: fade');}
     else if(anim==='slide'){els.container.classList.add('animate-slide');applied.push('animation: slide');}
 
-    // hide
     const hide = params.get('hide');
     if(hide==='title') els.title.classList.add('hidden');
     if(hide==='form') els.queryForm.classList.add('hidden');
 
-    // colors
     const bg = params.get('bgcolor');
     if(bg && /^#[0-9A-Fa-f]{6}$/i.test(bg)){root.style.setProperty('--bg-color',bg);applied.push(`bgcolor: ${bg}`);}
     const ac = params.get('accent');
     if(ac && /^#[0-9A-Fa-f]{6}$/i.test(ac)){root.style.setProperty('--accent-color',ac);applied.push(`accent: ${ac}`);}
 
-    // debug
     if(params.get('debug')==='1'){
         els.debug.style.display='block';
         els.debug.innerHTML=`<strong>Debug:</strong><br>URL: ${location.href}<br>UA: ${navigator.userAgent.split(' ').slice(0,3).join(' ')}…`;
         applied.push('debug: on');
     }
 
-    // display
     els.params.innerHTML = applied.length ? applied.join('<br>') : 'Default settings';
     if(params.toString()){
         els.params.innerHTML += `<br><br><small><strong>All params:</strong> ${Array.from(params).map(p=>p.join('=')).join(', ')}</small>`;
@@ -207,7 +208,7 @@ function apply(params){
 function updateFromURL(){
     const p = new URLSearchParams(location.search);
     apply(p);
-    refreshPresetsUI();
+    renderPresetList();
 }
 window.onload = updateFromURL;
 window.onpopstate = updateFromURL;
@@ -226,49 +227,54 @@ const STORAGE_KEY = 'queryParamPresets';
 function getPresets(){return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');}
 function savePresets(obj){localStorage.setItem(STORAGE_KEY,JSON.stringify(obj));}
 
-function refreshPresetsUI(){
+function renderPresetList(){
     const presets = getPresets();
-    const sel = els.loadPreset;
-    sel.innerHTML = '<option value="">— Load Preset —</option>';
-    Object.keys(presets).forEach(name=>{
-        const opt = document.createElement('option');
-        opt.value = name; opt.textContent = name;
-        sel.appendChild(opt);
+    const list = els.presetList;
+    list.innerHTML = '';
+    if(Object.keys(presets).length === 0){
+        list.innerHTML = '<em style="color:#999;font-size:0.9em;">No presets saved yet.</em>';
+        return;
+    }
+    Object.keys(presets).forEach(name => {
+        const qs = presets[name];
+        const item = document.createElement('div');
+        item.className = 'preset-item';
+        item.innerHTML = `
+            <span><strong>${name}</strong></span>
+            <div>
+                <button class="load-btn">Load</button>
+                <button class="delete-btn" title="Delete preset">Delete</button>
+            </div>
+        `;
+        const loadBtn = item.querySelector('.load-btn');
+        const delBtn = item.querySelector('.delete-btn');
+        loadBtn.onclick = () => {
+            const base = location.href.split('?')[0];
+            history.pushState({},"", qs ? `${base}?${qs}` : base);
+            updateFromURL();
+        };
+        delBtn.onclick = () => {
+            if(confirm(`Delete preset "${name}"?`)){
+                delete presets[name];
+                savePresets(presets);
+                renderPresetList();
+            }
+        };
+        list.appendChild(item);
     });
-    els.deletePreset.disabled = !sel.value;
 }
-refreshPresetsUI();
 
 els.savePreset.addEventListener('click',()=>{
     const name = els.presetName.value.trim();
     if(!name) return alert('Enter a preset name');
     const presets = getPresets();
-    if(Object.keys(presets).length>=5) return alert('Max 5 presets allowed');
+    if(Object.keys(presets).length >= 10) return alert('Max 10 presets allowed');
+    if(presets[name]) return alert(`Preset "${name}" already exists`);
     presets[name] = location.search.substring(1);
     savePresets(presets);
-    els.presetName.value='';
-    refreshPresetsUI();
-    alert(`Preset "${name}" saved`);
-});
-
-els.loadPreset.addEventListener('change',()=>{
-    const name = els.loadPreset.value;
-    if(!name) return;
-    const presets = getPresets();
-    const qs = presets[name];
-    const base = location.href.split('?')[0];
-    history.pushState({},"", qs ? `${base}?${qs}` : base);
-    updateFromURL();
-});
-
-els.deletePreset.addEventListener('click',()=>{
-    const name = els.loadPreset.value;
-    if(!name) return;
-    if(!confirm(`Delete preset "${name}"?`)) return;
-    const presets = getPresets();
-    delete presets[name];
-    savePresets(presets);
-    refreshPresetsUI();
+    els.presetName.value = '';
+    renderPresetList();
+    alert(`Preset "${name}" saved!`);
 });
 
 /* ---------- Export JSON ---------- */
@@ -285,18 +291,29 @@ els.exportJson.addEventListener('click',()=>{
     URL.revokeObjectURL(url);
 });
 
-/* ---------- QR Code ---------- */
+/* ---------- QR Code (Fixed) ---------- */
 els.showQr.addEventListener('click',()=>{
     els.qrSection.classList.toggle('hidden');
     if(!els.qrSection.classList.contains('hidden')){
-        QRCode.toCanvas(els.qrCanvas, location.href, {width:200,errorCorrectionLevel:'H'}, err=>{
+        // Clear previous
+        const ctx = els.qrCanvas.getContext('2d');
+        ctx.clearRect(0, 0, els.qrCanvas.width, els.qrCanvas.height);
+        // Generate
+        QRCode.toCanvas(els.qrCanvas, location.href, {
+            width: 200,
+            margin: 2,
+            color: {
+                dark: getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#000',
+                light: getComputedStyle(document.documentElement).getPropertyValue('--container-bg').trim() || '#fff'
+            }
+        }, err => {
             if(err) console.error(err);
         });
     }
 });
 
-/* ---------- Enable delete button when preset selected ---------- */
-els.loadPreset.addEventListener('change',()=>els.deletePreset.disabled=!els.loadPreset.value);
+/* ---------- Init ---------- */
+renderPresetList();
 </script>
 </body>
 </html>
