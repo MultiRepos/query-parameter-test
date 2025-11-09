@@ -427,22 +427,36 @@
             font-size: 0.9em;
         }
         
+        .tabs-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
         .tabs {
             display: flex;
             border-bottom: 1px solid var(--output-border);
-            margin-bottom: 20px;
+            position: relative;
         }
         
         .tab {
             padding: 10px 20px;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
+            position: relative;
+            z-index: 2;
         }
         
         .tab.active {
-            border-bottom: 3px solid var(--accent-color);
             color: var(--accent-color);
             font-weight: bold;
+        }
+        
+        .tab-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            background-color: var(--accent-color);
+            transition: all 0.3s ease;
+            z-index: 1;
         }
         
         .tab-content {
@@ -577,6 +591,10 @@
             .stats {
                 flex-direction: column;
             }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
@@ -610,11 +628,14 @@
             <code>layout=card&amp;hide=title,form&amp;animation=pulse&amp;debug=1</code>
         </div>
 
-        <div class="tabs">
-            <div class="tab active" data-tab="main">Main</div>
-            <div class="tab" data-tab="presets">Presets</div>
-            <div class="tab" data-tab="export">Export/Share</div>
-            <div class="tab" data-tab="features">Features</div>
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="main">Main</div>
+                <div class="tab" data-tab="presets">Presets</div>
+                <div class="tab" data-tab="export">Export/Share</div>
+                <div class="tab" data-tab="features">Features</div>
+                <div class="tab-indicator"></div>
+            </div>
         </div>
 
         <div class="tab-content active" id="main-tab">
@@ -781,7 +802,10 @@ const els = {
     notificationText: document.getElementById('notificationText'),
     paramCount: document.getElementById('paramCount'),
     presetCount: document.getElementById('presetCount'),
-    charCount: document.getElementById('charCount')
+    charCount: document.getElementById('charCount'),
+    tabsContainer: document.querySelector('.tabs-container'),
+    tabs: document.querySelector('.tabs'),
+    tabIndicator: document.querySelector('.tab-indicator')
 };
 const root = document.documentElement;
 const body = document.body;
@@ -928,6 +952,7 @@ function updateFromURL() {
     apply(p);
     renderPresetList();
     updateTabContent();
+    updateTabIndicator();
 }
 
 window.onload = updateFromURL;
@@ -943,22 +968,52 @@ els.queryForm.addEventListener('submit', e => {
     showNotification('Settings applied successfully!');
 });
 
-/* ---------- Tabs ---------- */
+/* ---------- Tabs with Hash Routing ---------- */
 function updateTabContent() {
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            // Remove active class from all tabs and contents
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            // Add active class to clicked tab and corresponding content
-            tab.classList.add('active');
-            const tabId = tab.getAttribute('data-tab');
-            document.getElementById(`${tabId}-tab`).classList.add('active');
-        });
-    });
+    // Get tab from hash or default to 'main'
+    const hash = window.location.hash.substring(1);
+    const activeTab = hash || 'main';
+    
+    // Remove active class from all tabs and contents
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Add active class to current tab and corresponding content
+    const activeTabElement = document.querySelector(`.tab[data-tab="${activeTab}"]`);
+    if (activeTabElement) {
+        activeTabElement.classList.add('active');
+        document.getElementById(`${activeTab}-tab`).classList.add('active');
+    } else {
+        // Fallback to main tab if hash is invalid
+        document.querySelector('.tab[data-tab="main"]').classList.add('active');
+        document.getElementById('main-tab').classList.add('active');
+    }
+    
+    // Update tab indicator position
+    updateTabIndicator();
 }
+
+function updateTabIndicator() {
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab && els.tabIndicator) {
+        const tabRect = activeTab.getBoundingClientRect();
+        const containerRect = els.tabs.getBoundingClientRect();
+        
+        els.tabIndicator.style.width = `${tabRect.width}px`;
+        els.tabIndicator.style.left = `${tabRect.left - containerRect.left}px`;
+    }
+}
+
+// Listen for hash changes
+window.addEventListener('hashchange', updateTabContent);
+
+// Set up tab click handlers
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        window.location.hash = tabId;
+    });
+});
 
 /* ---------- Presets (localStorage) ---------- */
 const STORAGE_KEY = 'queryParamPresets';
