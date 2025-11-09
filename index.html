@@ -62,7 +62,7 @@
         }
         .preset-item .delete-btn:hover{opacity:0.9;}
         .qr-section{margin-top:20px;text-align:center;}
-        #qrCanvas{display:block;margin:10px auto;max-width:200px;border:1px solid #ddd;border-radius:4px;}
+        #qrImage{display:block;margin:10px auto;max-width:200px;border:1px solid #ddd;border-radius:4px;}
     </style>
 </head>
 <body>
@@ -100,8 +100,8 @@
         <button id="showQr">Show QR Code</button>
     </div>
     <div class="qr-section hidden" id="qrSection">
-        <canvas id="qrCanvas" width="200" height="200"></canvas>
-        <p><small>Scan to open this exact configuration on another device.</small></p>
+        <img id="qrImage" src="" alt="QR Code">
+        <p><small>Scan to open this exact configuration on another device. (Requires internet for QR generation)</small></p>
     </div>
 
     <div id="debugPanel" class="debug-panel"></div>
@@ -109,7 +109,6 @@
     <p><small>All changes are client-side – share the URL!</small></p>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 /* ---------- Core Elements ---------- */
 const els = {
@@ -127,7 +126,7 @@ const els = {
     exportJson: document.getElementById('exportJson'),
     showQr: document.getElementById('showQr'),
     qrSection: document.getElementById('qrSection'),
-    qrCanvas: document.getElementById('qrCanvas')
+    qrImage: document.getElementById('qrImage')
 };
 const root = document.documentElement;
 const body = document.body;
@@ -291,23 +290,13 @@ els.exportJson.addEventListener('click',()=>{
     URL.revokeObjectURL(url);
 });
 
-/* ---------- QR Code ---------- */
+/* ---------- QR Code (Using API) ---------- */
 els.showQr.addEventListener('click',()=>{
     els.qrSection.classList.toggle('hidden');
     if(!els.qrSection.classList.contains('hidden')){
-        // Clear previous
-        els.qrCanvas.getContext('2d').clearRect(0, 0, els.qrCanvas.width, els.qrCanvas.height);
-        // Generate
-        QRCode.toCanvas(els.qrCanvas, location.href, {
-            width: 200,
-            margin: 2,
-            color: {
-                dark: getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#000',
-                light: getComputedStyle(document.documentElement).getPropertyValue('--container-bg').trim() || '#fff'
-            }
-        }, err => {
-            if(err) console.error(err);
-        });
+        els.qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(location.href)}`;
+    } else {
+        els.qrImage.src = ''; // Clear to avoid keeping old image
     }
 });
 
