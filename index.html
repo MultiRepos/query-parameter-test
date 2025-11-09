@@ -55,22 +55,14 @@
             border-radius:4px;margin-bottom:6px;font-size:0.9em;
         }
         .preset-item button{
-            padding:4px 8px;font-size:0.8em;margin-left:4px;border-radius:4px;
-        }
-        .preset-item .load-btn{
-            background:#27ae60;color:white;
+            padding:4px 8px;font-size:0.8em;margin-left:4px;
         }
         .preset-item .delete-btn{
-            background:#e74c3c;color:white;width:28px;height:28px;
-            padding:0;display:flex;align-items:center;justify-content:center;
-            font-size:1em;line-height:1;
+            background:#e74c3c;color:white;padding:4px 6px;
         }
-        .preset-item .delete-btn::before{
-            content:"Delete";
-            font-size:12px;
-        }
+        .preset-item .delete-btn:hover{opacity:0.9;}
         .qr-section{margin-top:20px;text-align:center;}
-        #qrCanvas{display:block;margin:10px auto;max-width:200px;border:2px solid var(--output-border);border-radius:6px;background:white;}
+        #qrCanvas{display:block;margin:10px auto;max-width:200px;border:1px solid #ddd;border-radius:4px;}
     </style>
 </head>
 <body>
@@ -243,15 +235,15 @@ function renderPresetList(){
         list.innerHTML = '<em style="color:#999;font-size:0.9em;">No presets saved yet.</em>';
         return;
     }
-    Object.keys(presets).sort().forEach(name => {
+    Object.keys(presets).forEach(name => {
         const qs = presets[name];
         const item = document.createElement('div');
         item.className = 'preset-item';
         item.innerHTML = `
-            <span title="Click Load to apply"><strong>${name}</strong></span>
+            <span><strong>${name}</strong></span>
             <div>
-                <button class="load-btn" title="Load preset">Load</button>
-                <button class="delete-btn" title="Delete preset">Delete</button>
+                <button class="load-btn">Load</button>
+                <button class="delete-btn" title="Delete preset">🗑️</button>
             </div>
         `;
         const loadBtn = item.querySelector('.load-btn');
@@ -299,27 +291,22 @@ els.exportJson.addEventListener('click',()=>{
     URL.revokeObjectURL(url);
 });
 
-/* ---------- QR Code (FIXED) ---------- */
+/* ---------- QR Code ---------- */
 els.showQr.addEventListener('click',()=>{
-    const wasHidden = els.qrSection.classList.contains('hidden');
     els.qrSection.classList.toggle('hidden');
-    
-    if (wasHidden) {
-        // Clear canvas first
-        const ctx = els.qrCanvas.getContext('2d');
-        ctx.clearRect(0, 0, 200, 200);
-        
-        // Generate QR with proper colors
-        const isDark = getComputedStyle(body).getPropertyValue('--bg-color').trim() === '#1a1a1a';
+    if(!els.qrSection.classList.contains('hidden')){
+        // Clear previous
+        els.qrCanvas.getContext('2d').clearRect(0, 0, els.qrCanvas.width, els.qrCanvas.height);
+        // Generate
         QRCode.toCanvas(els.qrCanvas, location.href, {
             width: 200,
             margin: 2,
             color: {
-                dark: isDark ? '#f0f0f0' : '#000000',
-                light: isDark ? '#2d2d2d' : '#ffffff'
+                dark: getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim() || '#000',
+                light: getComputedStyle(document.documentElement).getPropertyValue('--container-bg').trim() || '#fff'
             }
         }, err => {
-            if (err) console.error('QR Error:', err);
+            if(err) console.error(err);
         });
     }
 });
